@@ -1,5 +1,2 @@
-add_library(KPeopleVCard SHARED kpeoplevcard.cpp main.cpp)
+kcoreaddons_add_plugin(KPeopleVCard SOURCES kpeoplevcard.cpp INSTALL_NAMESPACE "kpeople/datasource")
 target_link_libraries(KPeopleVCard KF5::PeopleBackend KF5::CoreAddons KF5::Contacts)
-
-install(TARGETS KPeopleVCard DESTINATION ${PLUGIN_INSTALL_DIR})
-install(FILES kpeoplevcard_source_plugin.desktop DESTINATION ${SERVICES_INSTALL_DIR})
