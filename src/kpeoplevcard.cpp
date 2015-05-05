@@ -22,6 +22,10 @@
 #include <QStandardPaths>
 #include <KContacts/VCardConverter>
 #include <KContacts/Picture>
+#include <KPeopleBackend/BasePersonsDataSource>
+
+#include <KPluginFactory>
+#include <KPluginLoader>
 
 using namespace KPeople;
 
@@ -51,6 +55,16 @@ public:
     }
 private:
     KContacts::Addressee m_addressee;
+};
+
+class VCardDataSource : public KPeople::BasePersonsDataSource
+{
+public:
+    VCardDataSource(QObject *parent, const QVariantList &data);
+    virtual ~VCardDataSource();
+    virtual QString sourcePluginId() const;
+
+    virtual KPeople::AllContactsMonitor* createAllContactsMonitor();
 };
 
 KPeopleVCard::KPeopleVCard()
@@ -117,3 +131,28 @@ QString KPeopleVCard::contactsVCardPath()
 {
     return *vcardsLocation;
 }
+
+VCardDataSource::VCardDataSource(QObject *parent, const QVariantList &args)
+: BasePersonsDataSource(parent)
+{
+    Q_UNUSED(args);
+}
+
+VCardDataSource::~VCardDataSource()
+{
+}
+
+QString VCardDataSource::sourcePluginId() const
+{
+    return QStringLiteral("vcard");
+}
+
+AllContactsMonitor* VCardDataSource::createAllContactsMonitor()
+{
+    return new KPeopleVCard();
+}
+
+K_PLUGIN_FACTORY_WITH_JSON( VCardDataSourceFactory, "kpeoplevcard.json", registerPlugin<VCardDataSource>(); )
+K_EXPORT_PLUGIN( VCardDataSourceFactory("kpeoplevcard") )
+
+#include "kpeoplevcard.moc"
