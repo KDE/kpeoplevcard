@@ -42,7 +42,7 @@ public:
     {
         QVariant ret;
         if (key == NameProperty)
-            return m_addressee.name();
+            return m_addressee.formattedName();
         else if (key == EmailProperty)
             return m_addressee.preferredEmail();
         else if (key == PictureProperty)
