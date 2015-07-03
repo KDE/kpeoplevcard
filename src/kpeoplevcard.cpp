@@ -54,6 +54,8 @@ public:
                 numbers << phoneNumber.toString();
             }
             return numbers;
+        } else if (key == PhoneNumberProperty) {
+            return m_addressee.phoneNumbers().isEmpty() ? QVariant() : m_addressee.phoneNumbers().at(0).number();
         }
 
         return ret;
