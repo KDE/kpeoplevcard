@@ -41,9 +41,18 @@ public:
     QVariant customProperty(const QString & key) const override
     {
         QVariant ret;
-        if (key == NameProperty)
-            return m_addressee.formattedName();
-        else if (key == EmailProperty)
+        if (key == NameProperty) {
+            if (!m_addressee.formattedName().isEmpty()) {
+                return m_addressee.formattedName();
+            }
+            if (!m_addressee.preferredEmail().isEmpty()) {
+                return m_addressee.preferredEmail();
+            }
+            if (!m_addressee.phoneNumbers().isEmpty()) {
+                return m_addressee.phoneNumbers().at(0).number();
+            }
+            return QVariant();
+        } else if (key == EmailProperty)
             return m_addressee.preferredEmail();
         else if (key == PictureProperty)
             return m_addressee.photo().data();
