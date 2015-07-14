@@ -56,14 +56,14 @@ public:
             return m_addressee.preferredEmail();
         else if (key == PictureProperty)
             return m_addressee.photo().data();
-        else if (key == AllPhoneNumbersProperty) {
+/*        else if (key == AllPhoneNumbersProperty) {
             QVariantList numbers;
             Q_FOREACH (const KContacts::PhoneNumber &phoneNumber, m_addressee.phoneNumbers()) {
                 // convert from KContacts specific format to QString
                 numbers << phoneNumber.toString();
             }
             return numbers;
-        } else if (key == PhoneNumberProperty) {
+        }*/ else if (key == PhoneNumberProperty) {
             return m_addressee.phoneNumbers().isEmpty() ? QVariant() : m_addressee.phoneNumbers().at(0).number();
         }
 
