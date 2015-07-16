@@ -95,12 +95,22 @@ KPeopleVCard::KPeopleVCard()
     QDir().mkpath(*vcardsLocation);
 
     QDir dir(*vcardsLocation);
-    const QStringList entries = dir.entryList({"*.vcard"});
-    foreach(const QString& entry, entries) {
-        processVCard(dir.absoluteFilePath(entry));
+    const QStringList subdirs = dir.entryList(QDir::AllDirs | QDir::NoDotDot); // includes '.', ie. vcards from no subdir
+    QStringList entries;
+
+    foreach(const QString &subdirName, subdirs) {
+        QDir subdir(dir.absoluteFilePath(subdirName));
+        QFileInfoList subdirVcards = subdir.entryInfoList({"*.vcard"});
+        foreach(const QFileInfo &vcardFile, subdirVcards) {
+            entries << vcardFile.absoluteFilePath();
+        }
     }
 
-    m_fs->addDir(dir.absolutePath());
+    foreach(const QString& entry, entries) {
+        processVCard(entry);
+    }
+
+    m_fs->addDir(dir.absolutePath(), KDirWatch::WatchDirOnly | KDirWatch::WatchSubDirs);
     connect(m_fs, &KDirWatch::dirty, this, [this](const QString& path){ if (QFileInfo(path).isFile()) processVCard(path); });
     connect(m_fs, &KDirWatch::created, this, &KPeopleVCard::processVCard);
     connect(m_fs, &KDirWatch::deleted, this, &KPeopleVCard::deleteVCard);

@@ -55,7 +55,9 @@ private Q_SLOTS:
             QFile::remove(entry.absoluteFilePath());
         }
 
-        QCOMPARE(m_vcardsDir.count(), uint(2)); //. and ..
+        QDir().temp().mkpath(KPeopleVCard::contactsVCardPath() + "/subdir");
+
+        QCOMPARE(m_vcardsDir.count(), uint(3)); //. and .. and subdir/
 
         m_backend = new KPeopleVCard;
         m_backend->setParent(this);
@@ -75,16 +77,25 @@ private Q_SLOTS:
         KContacts::Addressee addr;
         addr.setName(name);
         const QString path = m_vcardsDir.absoluteFilePath("X");
+        const QString pathInSubdir = m_vcardsDir.absoluteFilePath("subdir/a");
         // CREATE
         {
             QSignalSpy spy(m_backend, &KPeople::AllContactsMonitor::contactAdded);
             writeContact(addr, path);
+            QVERIFY(spy.wait());
+
+            // write the same contact into a subdir
+            writeContact(addr, pathInSubdir);
             QVERIFY(spy.wait());
         }
 
         // READ
         {
             KPeople::AbstractContact::Ptr ptr = m_backend->contacts().first();
+            QCOMPARE(ptr->customProperty(KPeople::AbstractContact::NameProperty).toString(), name);
+
+            // the contact in subdir
+            ptr = m_backend->contacts().last();
             QCOMPARE(ptr->customProperty(KPeople::AbstractContact::NameProperty).toString(), name);
         }
 
@@ -94,11 +105,17 @@ private Q_SLOTS:
             QSignalSpy spy(m_backend, &KPeople::AllContactsMonitor::contactChanged);
             writeContact(addr, path);
             QVERIFY(spy.wait());
+
+            writeContact(addr, pathInSubdir);
+            QVERIFY(spy.wait());
         }
 
         // READ
         {
             KPeople::AbstractContact::Ptr ptr = m_backend->contacts().first();
+            QCOMPARE(ptr->customProperty(KPeople::AbstractContact::NameProperty).toString(), name2);
+
+            ptr = m_backend->contacts().last();
             QCOMPARE(ptr->customProperty(KPeople::AbstractContact::NameProperty).toString(), name2);
         }
 
@@ -106,6 +123,9 @@ private Q_SLOTS:
         {
             QSignalSpy spy(m_backend, &KPeople::AllContactsMonitor::contactRemoved);
             QFile::remove(path);
+            QVERIFY(spy.wait());
+
+            QFile::remove(pathInSubdir);
             QVERIFY(spy.wait());
         }
 
