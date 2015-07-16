@@ -42,8 +42,9 @@ public:
     {
         QVariant ret;
         if (key == NameProperty) {
-            if (!m_addressee.formattedName().isEmpty()) {
-                return m_addressee.formattedName();
+            const QString name = m_addressee.realName();
+            if (!name.isEmpty()) {
+                return name;
             }
             if (!m_addressee.preferredEmail().isEmpty()) {
                 return m_addressee.preferredEmail();
