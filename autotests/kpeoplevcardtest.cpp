@@ -47,6 +47,8 @@ private Q_SLOTS:
         QStandardPaths::setTestModeEnabled(true);
         m_vcardsDir = QDir(KPeopleVCard::contactsVCardPath());
 
+        QDir().temp().mkpath(KPeopleVCard::contactsVCardPath());
+
         QVERIFY(m_vcardsDir.exists());
 
         foreach(const QFileInfo & entry, m_vcardsDir.entryInfoList(QDir::Files)) {
