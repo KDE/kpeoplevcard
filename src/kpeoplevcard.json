@@ -1,12 +1,12 @@
 {
-    "Encoding": "UTF-8",
+    "Encoding": "UTF-8", 
     "KPlugin": {
-        "EnabledByDefault": true,
-        "Id": "VCardProvider",
-        "License": "LGPL",
+        "EnabledByDefault": true, 
+        "Id": "VCardProvider", 
+        "License": "LGPL", 
         "ServiceTypes": [
             "KPeople/DataSource"
-        ],
+        ], 
         "Version": "0.1"
     }
 }
