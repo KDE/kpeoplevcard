@@ -19,6 +19,7 @@
 
 #include "kpeoplevcard.h"
 #include <QDebug>
+#include <QImage>
 #include <QDir>
 #include <QStandardPaths>
 #include <KContacts/VCardConverter>
