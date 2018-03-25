@@ -74,7 +74,7 @@ public:
     }
 
     static QString createUri(const QString& path) {
-        return QStringLiteral("vcard:") + path;
+        return QStringLiteral("vcard:/") + path;
     }
 private:
     KContacts::Addressee m_addressee;
