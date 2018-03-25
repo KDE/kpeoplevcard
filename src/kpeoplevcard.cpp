@@ -102,7 +102,7 @@ KPeopleVCard::KPeopleVCard()
 
     foreach(const QString &subdirName, subdirs) {
         QDir subdir(dir.absoluteFilePath(subdirName));
-        QFileInfoList subdirVcards = subdir.entryInfoList({"*.vcard"});
+        QFileInfoList subdirVcards = subdir.entryInfoList({"*.vcard", "*.vcf"});
         foreach(const QFileInfo &vcardFile, subdirVcards) {
             entries << vcardFile.absoluteFilePath();
         }
