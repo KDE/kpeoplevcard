@@ -148,7 +148,7 @@ void KPeopleVCard::processVCard(const QString &path)
     } else {
         KPeople::AbstractContact::Ptr contact(new VCardContact(addressee));
         m_contactForUri.insert(uri, contact);
-        Q_EMIT contactAdded(uri, *it);
+        Q_EMIT contactAdded(uri, contact);
     }
 }
 
