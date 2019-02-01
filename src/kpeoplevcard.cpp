@@ -85,9 +85,9 @@ class VCardDataSource : public KPeople::BasePersonsDataSource
 public:
     VCardDataSource(QObject *parent, const QVariantList &data);
     virtual ~VCardDataSource();
-    virtual QString sourcePluginId() const;
+    QString sourcePluginId() const override;
 
-    virtual KPeople::AllContactsMonitor* createAllContactsMonitor();
+    KPeople::AllContactsMonitor* createAllContactsMonitor() override;
 };
 
 KPeopleVCard::KPeopleVCard()
