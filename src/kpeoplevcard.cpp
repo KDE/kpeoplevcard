@@ -63,7 +63,7 @@ public:
             QVariantList numbers;
             Q_FOREACH (const KContacts::PhoneNumber &phoneNumber, m_addressee.phoneNumbers()) {
                 // convert from KContacts specific format to QString
-                numbers << phoneNumber.toString();
+                numbers << phoneNumber.number();
             }
             return numbers;
         } else if (key == PhoneNumberProperty) {
