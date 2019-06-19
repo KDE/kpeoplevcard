@@ -60,8 +60,9 @@ public:
         else if (key == PictureProperty)
             return m_addressee.photo().data();
         else if (key == AllPhoneNumbersProperty) {
+            const auto phoneNumbers = m_addressee.phoneNumbers();
             QVariantList numbers;
-            Q_FOREACH (const KContacts::PhoneNumber &phoneNumber, m_addressee.phoneNumbers()) {
+            for (const KContacts::PhoneNumber &phoneNumber : phoneNumbers) {
                 // convert from KContacts specific format to QString
                 numbers << phoneNumber.number();
             }
@@ -84,7 +85,7 @@ class VCardDataSource : public KPeople::BasePersonsDataSource
 {
 public:
     VCardDataSource(QObject *parent, const QVariantList &data);
-    virtual ~VCardDataSource();
+    ~VCardDataSource() override;
     QString sourcePluginId() const override;
 
     KPeople::AllContactsMonitor* createAllContactsMonitor() override;
@@ -100,15 +101,15 @@ KPeopleVCard::KPeopleVCard()
     const QStringList subdirs = dir.entryList(QDir::AllDirs | QDir::NoDotDot); // includes '.', ie. vcards from no subdir
     QStringList entries;
 
-    foreach(const QString &subdirName, subdirs) {
+    for (const QString &subdirName : subdirs) {
         QDir subdir(dir.absoluteFilePath(subdirName));
-        QFileInfoList subdirVcards = subdir.entryInfoList({"*.vcard", "*.vcf"});
-        foreach(const QFileInfo &vcardFile, subdirVcards) {
+        const QFileInfoList subdirVcards = subdir.entryInfoList({"*.vcard", "*.vcf"});
+        for (const QFileInfo &vcardFile : subdirVcards) {
             entries << vcardFile.absoluteFilePath();
         }
     }
 
-    foreach(const QString& entry, entries) {
+    for (const QString& entry : qAsConst(entries)) {
         processVCard(entry);
     }
 

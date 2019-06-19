@@ -30,7 +30,7 @@ class Q_DECL_EXPORT KPeopleVCard : public KPeople::AllContactsMonitor
 
 public:
     KPeopleVCard();
-    virtual ~KPeopleVCard();
+    ~KPeopleVCard() override;
 
     QMap<QString, KPeople::AbstractContact::Ptr> contacts() override;
     static QString contactsVCardPath();
