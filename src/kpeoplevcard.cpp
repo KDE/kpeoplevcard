@@ -57,6 +57,8 @@ public:
             return QVariant();
         } else if (key == EmailProperty)
             return m_addressee.preferredEmail();
+        else if (key == AllEmailsProperty)
+            return m_addressee.emails();
         else if (key == PictureProperty)
             return m_addressee.photo().data();
         else if (key == AllPhoneNumbersProperty) {
