@@ -18,7 +18,7 @@ include(KDECompilerSettings NO_POLICY_SCOPE)
 include(ECMAddTests)
 
 find_package(Qt5 "5.2" REQUIRED COMPONENTS Widgets)
-find_package(KF5 "5.8" REQUIRED COMPONENTS CoreAddons People)
+find_package(KF5 "5.8" REQUIRED COMPONENTS CoreAddons People I18n)
 
 find_package(KF5Contacts REQUIRED)
 

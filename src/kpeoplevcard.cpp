@@ -25,6 +25,7 @@
 #include <KContacts/VCardConverter>
 #include <KContacts/Picture>
 #include <KPeopleBackend/BasePersonsDataSource>
+#include <KLocalizedString>
 
 #include <KPluginFactory>
 #include <KPluginLoader>
@@ -48,6 +49,18 @@ public:
             if (!name.isEmpty()) {
                 return name;
             }
+
+            // If both first and last name are set combine them to a full name
+            if (!m_addressee.givenName().isEmpty() && !m_addressee.familyName().isEmpty())
+                return i18nc("given-name family-name", "%1 %2", m_addressee.givenName(), m_addressee.familyName());
+
+            // If only one of them is set just return what we know
+            if (!m_addressee.givenName().isEmpty())
+                return m_addressee.givenName();
+            if (!m_addressee.familyName().isEmpty())
+                return m_addressee.familyName();
+
+            // Fall back to other identifiers
             if (!m_addressee.preferredEmail().isEmpty()) {
                 return m_addressee.preferredEmail();
             }
