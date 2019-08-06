@@ -170,6 +170,8 @@ void KPeopleVCard::processVCard(const QString &path)
 
 void KPeopleVCard::deleteVCard(const QString &path)
 {
+    if (QFile::exists(path))
+        return;
     QString uri = VCardContact::createUri(path);
     int r = m_contactForUri.remove(uri);
     Q_ASSERT(r);
