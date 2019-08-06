@@ -25,21 +25,25 @@
 #include <KContacts/VCardConverter>
 #include <KContacts/Picture>
 #include <KPeopleBackend/BasePersonsDataSource>
+#include <KPeopleBackend/AbstractEditableContact>
 #include <KLocalizedString>
 
 #include <KPluginFactory>
 #include <KPluginLoader>
+#include <KFileUtils>
 
 using namespace KPeople;
 
 Q_GLOBAL_STATIC_WITH_ARGS(QString, vcardsLocation, (QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + ("/kpeoplevcard")))
+Q_GLOBAL_STATIC_WITH_ARGS(QString, vcardsWriteLocation, (QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + ("/kpeoplevcard/own/")))
 
-class VCardContact : public AbstractContact
+class VCardContact : public AbstractEditableContact
 {
 public:
     VCardContact() {}
-    VCardContact(const KContacts::Addressee& addr) : m_addressee(addr) {}
+    VCardContact(const KContacts::Addressee& addr, const QUrl &location) : m_addressee(addr), m_location(location) {}
     void setAddressee(const KContacts::Addressee& addr) { m_addressee = addr; }
+    void setUrl(const QUrl &url) { m_location = url; }
 
     QVariant customProperty(const QString & key) const override
     {
@@ -84,9 +88,23 @@ public:
             return numbers;
         } else if (key == PhoneNumberProperty) {
             return m_addressee.phoneNumbers().isEmpty() ? QVariant() : m_addressee.phoneNumbers().at(0).number();
+        } else if (key == VCardProperty) {
+            KContacts::VCardConverter converter;
+            return converter.createVCard(m_addressee);
         }
 
         return ret;
+    }
+
+    bool setCustomProperty(const QString & key, const QVariant & value) override {
+        if (key == VCardProperty) {
+            QFile f(m_location.toLocalFile());
+            if (!f.open(QIODevice::WriteOnly))
+                return false;
+            f.write(value.toByteArray());
+            return true;
+        }
+        return false;
     }
 
     static QString createUri(const QString& path) {
@@ -94,9 +112,10 @@ public:
     }
 private:
     KContacts::Addressee m_addressee;
+    QUrl m_location;
 };
 
-class VCardDataSource : public KPeople::BasePersonsDataSource
+class VCardDataSource : public KPeople::BasePersonsDataSourceV2
 {
 public:
     VCardDataSource(QObject *parent, const QVariantList &data);
@@ -104,6 +123,22 @@ public:
     QString sourcePluginId() const override;
 
     KPeople::AllContactsMonitor* createAllContactsMonitor() override;
+    bool addContact(const QVariantMap & properties) override {
+        if (!properties.contains("vcard"))
+            return false;
+
+        if (!QDir().mkpath(*vcardsWriteLocation))
+            return false;
+
+        QFile f(*vcardsWriteLocation + KFileUtils::suggestName(QUrl::fromLocalFile(*vcardsWriteLocation), QStringLiteral("contact.vcard")));
+        if (!f.open(QFile::WriteOnly)) {
+            qWarning() << "could not open file to write" << f.fileName();
+            return false;
+        }
+
+        f.write(properties.value("vcard").toByteArray());
+        return true;
+    }
 };
 
 KPeopleVCard::KPeopleVCard()
@@ -160,9 +195,10 @@ void KPeopleVCard::processVCard(const QString &path)
     auto it = m_contactForUri.find(uri);
     if (it != m_contactForUri.end()) {
         static_cast<VCardContact*>(it->data())->setAddressee(addressee);
+        static_cast<VCardContact*>(it->data())->setUrl(QUrl::fromLocalFile(path));
         Q_EMIT contactChanged(uri, *it);
     } else {
-        KPeople::AbstractContact::Ptr contact(new VCardContact(addressee));
+        KPeople::AbstractContact::Ptr contact(new VCardContact(addressee, QUrl::fromLocalFile(path)));
         m_contactForUri.insert(uri, contact);
         Q_EMIT contactAdded(uri, contact);
     }
@@ -184,7 +220,7 @@ QString KPeopleVCard::contactsVCardPath()
 }
 
 VCardDataSource::VCardDataSource(QObject *parent, const QVariantList &args)
-: BasePersonsDataSource(parent)
+    : BasePersonsDataSourceV2(parent)
 {
     Q_UNUSED(args);
 }
