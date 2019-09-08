@@ -135,7 +135,6 @@ bool VCardDataSource::deleteContact(const QString &uri)
 {
     QString path = uri;
     path.remove("vcard:/");
-
     return QFile::remove(path);
 }
 
@@ -172,7 +171,6 @@ QMap<QString, AbstractContact::Ptr> KPeopleVCard::contacts()
 
 void KPeopleVCard::processDirectory(const QFileInfo& fi)
 {
-    static int i = 0;
     const QDir dir(fi.absoluteFilePath());
     {
         const auto subdirs = dir.entryInfoList(QDir::AllDirs | QDir::NoDotAndDotDot); // includes '.', ie. vcards from no subdir
@@ -223,9 +221,10 @@ void KPeopleVCard::deleteVCard(const QString &path)
     if (QFile::exists(path))
         return;
     QString uri = VCardContact::createUri(path);
-    int r = m_contactForUri.remove(uri);
-    Q_ASSERT(r);
-    Q_EMIT contactRemoved(uri);
+
+    const int r = m_contactForUri.remove(uri);
+    if (r)
+        Q_EMIT contactRemoved(uri);
 }
 
 QString KPeopleVCard::contactsVCardPath()

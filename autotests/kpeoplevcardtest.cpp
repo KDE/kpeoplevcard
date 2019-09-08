@@ -141,12 +141,28 @@ private Q_SLOTS:
     void editableInterface() {
         KContacts::Addressee addr;
         addr.setName(QStringLiteral("Potato Person"));
+        QString uri;
 
         {
             QSignalSpy spy(m_backend, &KPeople::AllContactsMonitor::contactAdded);
             QVERIFY(m_source->addContact({ {"vcard", createContact(addr) } }));
             QVERIFY(spy.wait());
+
+            uri = spy.constFirst().constFirst().toString();
         }
+
+        QCOMPARE(QDir(KPeopleVCard::contactsVCardWritePath()).count(), 3); //. .. and the potato person
+        QVERIFY(m_backend->contacts().contains(uri));
+
+        {
+            QSignalSpy spy(m_backend, &KPeople::AllContactsMonitor::contactRemoved);
+            QVERIFY(m_source->deleteContact(uri));
+            QVERIFY(spy.wait());
+
+            uri = spy.constFirst().constFirst().toString();
+        }
+        QCOMPARE(QDir(KPeopleVCard::contactsVCardWritePath()).count(), 2); //. .. and the potato person
+        QVERIFY(!m_backend->contacts().contains(uri));
     }
 
 private:
