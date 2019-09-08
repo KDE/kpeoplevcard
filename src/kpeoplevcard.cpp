@@ -131,6 +131,14 @@ bool VCardDataSource::addContact(const QVariantMap & properties)
     return true;
 }
 
+bool VCardDataSource::deleteContact(const QString &uri)
+{
+    QString path = uri;
+    path.remove("vcard:/");
+
+    return QFile::remove(path);
+}
+
 KPeopleVCard::KPeopleVCard()
     : KPeople::AllContactsMonitor()
     , m_fs(new KDirWatch(this))

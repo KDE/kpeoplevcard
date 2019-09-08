@@ -59,6 +59,7 @@ public:
 
     KPeople::AllContactsMonitor* createAllContactsMonitor() override;
     bool addContact(const QVariantMap & properties) override;
+    bool deleteContact(const QString &uri) override;
 };
 
 #endif
