@@ -29,16 +29,22 @@ class KPeopleVCardTest : public QObject
 Q_OBJECT
 public:
     KPeopleVCardTest()
+        : m_source(new VCardDataSource(this, {}))
     {}
+
+    QByteArray createContact(const KContacts::Addressee& addressee)
+    {
+        KContacts::VCardConverter conv;
+        return conv.exportVCard(addressee, KContacts::VCardConverter::v3_0);
+    }
 
     void writeContact(const KContacts::Addressee& addressee, const QString& path)
     {
         QFile f(path);
         bool b = f.open(QIODevice::WriteOnly);
         Q_ASSERT(b);
-        KContacts::VCardConverter conv;
 
-        f.write(conv.exportVCard(addressee, KContacts::VCardConverter::v3_0));
+        f.write(createContact(addressee));
     }
 
 private Q_SLOTS:
@@ -55,12 +61,11 @@ private Q_SLOTS:
             QFile::remove(entry.absoluteFilePath());
         }
 
+        QDir(KPeopleVCard::contactsVCardWritePath()).removeRecursively();
         QDir().temp().mkpath(KPeopleVCard::contactsVCardPath() + "/subdir");
-
         QCOMPARE(m_vcardsDir.count(), uint(3)); //. and .. and subdir/
 
-        m_backend = new KPeopleVCard;
-        m_backend->setParent(this);
+        m_backend = dynamic_cast<KPeopleVCard*>(m_source->createAllContactsMonitor());
     }
 
     void emptyTest()
@@ -133,8 +138,20 @@ private Q_SLOTS:
         QVERIFY(m_backend->contacts().isEmpty());
     }
 
+    void editableInterface() {
+        KContacts::Addressee addr;
+        addr.setName(QStringLiteral("Potato Person"));
+
+        {
+            QSignalSpy spy(m_backend, &KPeople::AllContactsMonitor::contactAdded);
+            QVERIFY(m_source->addContact({ {"vcard", createContact(addr) } }));
+            QVERIFY(spy.wait());
+        }
+    }
+
 private:
     KPeopleVCard* m_backend;
+    VCardDataSource* m_source;
     QDir m_vcardsDir;
 };
 

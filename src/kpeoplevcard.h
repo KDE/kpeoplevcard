@@ -23,6 +23,10 @@
 #include <KDirWatch>
 #include <KPeopleBackend/AllContactsMonitor>
 #include <KPeopleBackend/AbstractContact>
+#include <KPeopleBackend/BasePersonsDataSource>
+#include <KPeopleBackend/AbstractEditableContact>
+
+class QFileInfo;
 
 class Q_DECL_EXPORT KPeopleVCard : public KPeople::AllContactsMonitor
 {
@@ -34,13 +38,27 @@ public:
 
     QMap<QString, KPeople::AbstractContact::Ptr> contacts() override;
     static QString contactsVCardPath();
+    static QString contactsVCardWritePath();
 
 private:
     void processVCard(const QString &path);
     void deleteVCard(const QString &path);
+    void processDirectory(const QFileInfo &fi);
 
     QMap<QString, KPeople::AbstractContact::Ptr> m_contactForUri;
     KDirWatch* m_fs;
+};
+
+
+class VCardDataSource : public KPeople::BasePersonsDataSourceV2
+{
+public:
+    VCardDataSource(QObject *parent, const QVariantList &data);
+    ~VCardDataSource() override;
+    QString sourcePluginId() const override;
+
+    KPeople::AllContactsMonitor* createAllContactsMonitor() override;
+    bool addContact(const QVariantMap & properties) override;
 };
 
 #endif

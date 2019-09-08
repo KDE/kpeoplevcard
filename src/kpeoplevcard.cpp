@@ -24,8 +24,6 @@
 #include <QStandardPaths>
 #include <KContacts/VCardConverter>
 #include <KContacts/Picture>
-#include <KPeopleBackend/BasePersonsDataSource>
-#include <KPeopleBackend/AbstractEditableContact>
 #include <KLocalizedString>
 
 #include <KPluginFactory>
@@ -115,31 +113,23 @@ private:
     QUrl m_location;
 };
 
-class VCardDataSource : public KPeople::BasePersonsDataSourceV2
+bool VCardDataSource::addContact(const QVariantMap & properties)
 {
-public:
-    VCardDataSource(QObject *parent, const QVariantList &data);
-    ~VCardDataSource() override;
-    QString sourcePluginId() const override;
+    if (!properties.contains("vcard"))
+        return false;
 
-    KPeople::AllContactsMonitor* createAllContactsMonitor() override;
-    bool addContact(const QVariantMap & properties) override {
-        if (!properties.contains("vcard"))
-            return false;
+    if (!QDir().mkpath(*vcardsWriteLocation))
+        return false;
 
-        if (!QDir().mkpath(*vcardsWriteLocation))
-            return false;
-
-        QFile f(*vcardsWriteLocation + KFileUtils::suggestName(QUrl::fromLocalFile(*vcardsWriteLocation), QStringLiteral("contact.vcard")));
-        if (!f.open(QFile::WriteOnly)) {
-            qWarning() << "could not open file to write" << f.fileName();
-            return false;
-        }
-
-        f.write(properties.value("vcard").toByteArray());
-        return true;
+    QFile f(*vcardsWriteLocation + KFileUtils::suggestName(QUrl::fromLocalFile(*vcardsWriteLocation), QStringLiteral("contact.vcard")));
+    if (!f.open(QFile::WriteOnly)) {
+        qWarning() << "could not open file to write" << f.fileName();
+        return false;
     }
-};
+
+    f.write(properties.value("vcard").toByteArray());
+    return true;
+}
 
 KPeopleVCard::KPeopleVCard()
     : KPeople::AllContactsMonitor()
@@ -147,25 +137,20 @@ KPeopleVCard::KPeopleVCard()
 {
     QDir().mkpath(*vcardsLocation);
 
-    QDir dir(*vcardsLocation);
-    const QStringList subdirs = dir.entryList(QDir::AllDirs | QDir::NoDotDot); // includes '.', ie. vcards from no subdir
-    QStringList entries;
+    processDirectory(QFileInfo(*vcardsLocation));
 
-    for (const QString &subdirName : subdirs) {
-        QDir subdir(dir.absoluteFilePath(subdirName));
-        const QFileInfoList subdirVcards = subdir.entryInfoList({"*.vcard", "*.vcf"});
-        for (const QFileInfo &vcardFile : subdirVcards) {
-            entries << vcardFile.absoluteFilePath();
-        }
-    }
-
-    for (const QString& entry : qAsConst(entries)) {
-        processVCard(entry);
-    }
-
-    m_fs->addDir(dir.absolutePath(), KDirWatch::WatchDirOnly | KDirWatch::WatchSubDirs);
-    connect(m_fs, &KDirWatch::dirty, this, [this](const QString& path){ if (QFileInfo(path).isFile()) processVCard(path); });
-    connect(m_fs, &KDirWatch::created, this, &KPeopleVCard::processVCard);
+    connect(m_fs, &KDirWatch::dirty, this, [this](const QString& path) {
+        const QFileInfo fi(path);
+        if (fi.isFile())
+            processVCard(path);
+    });
+    connect(m_fs, &KDirWatch::created, this, [this] (const QString &path) {
+        const QFileInfo fi(path);
+        if (fi.isFile())
+            processVCard(path);
+        else
+            processDirectory(fi);
+    });
     connect(m_fs, &KDirWatch::deleted, this, &KPeopleVCard::deleteVCard);
 }
 
@@ -175,6 +160,27 @@ KPeopleVCard::~KPeopleVCard()
 QMap<QString, AbstractContact::Ptr> KPeopleVCard::contacts()
 {
     return m_contactForUri;
+}
+
+void KPeopleVCard::processDirectory(const QFileInfo& fi)
+{
+    static int i = 0;
+    const QDir dir(fi.absoluteFilePath());
+    {
+        const auto subdirs = dir.entryInfoList(QDir::AllDirs | QDir::NoDotAndDotDot); // includes '.', ie. vcards from no subdir
+
+        for (const auto &subdir : subdirs) {
+            processDirectory(subdir);
+        }
+    }
+
+    {
+        const QFileInfoList subdirVcards = dir.entryInfoList({"*.vcard", "*.vcf"});
+        for (const QFileInfo &vcardFile : subdirVcards) {
+            processVCard(vcardFile.absoluteFilePath());
+        }
+    }
+    m_fs->addDir(dir.absolutePath(), KDirWatch::WatchDirOnly | KDirWatch::WatchSubDirs | KDirWatch::WatchFiles);
 }
 
 void KPeopleVCard::processVCard(const QString &path)
@@ -217,6 +223,11 @@ void KPeopleVCard::deleteVCard(const QString &path)
 QString KPeopleVCard::contactsVCardPath()
 {
     return *vcardsLocation;
+}
+
+QString KPeopleVCard::contactsVCardWritePath()
+{
+    return *vcardsWriteLocation;
 }
 
 VCardDataSource::VCardDataSource(QObject *parent, const QVariantList &args)
