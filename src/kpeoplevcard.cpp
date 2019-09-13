@@ -133,8 +133,15 @@ bool VCardDataSource::addContact(const QVariantMap & properties)
 
 bool VCardDataSource::deleteContact(const QString &uri)
 {
+    if (!uri.startsWith("vcard:/"))
+        return false;
+
     QString path = uri;
     path.remove("vcard:/");
+
+    if (!path.startsWith(*vcardsLocation))
+        return false;
+
     return QFile::remove(path);
 }
 
