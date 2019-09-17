@@ -157,6 +157,8 @@ KPeopleVCard::KPeopleVCard()
         const QFileInfo fi(path);
         if (fi.isFile())
             processVCard(path);
+        else
+            processDirectory(fi);
     });
     connect(m_fs, &KDirWatch::created, this, [this] (const QString &path) {
         const QFileInfo fi(path);
