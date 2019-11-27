@@ -142,24 +142,47 @@ private Q_SLOTS:
         KContacts::Addressee addr;
         addr.setName(QStringLiteral("Potato Person"));
         QString uri;
+        KPeople::AbstractContact::Ptr ptr;
 
+        //CREATE
         {
             QSignalSpy spy(m_backend, &KPeople::AllContactsMonitor::contactAdded);
             QVERIFY(m_source->addContact({ {"vcard", createContact(addr) } }));
             QVERIFY(spy.wait());
 
             uri = spy.constFirst().constFirst().toString();
+            ptr = spy.constFirst().constLast().value<KPeople::AbstractContact::Ptr>();
+
+            QVERIFY(m_backend->contacts().contains(uri));
+            QCOMPARE(QDir(KPeopleVCard::contactsVCardWritePath()).count(), 3); //. .. and the potato person
         }
 
-        QCOMPARE(QDir(KPeopleVCard::contactsVCardWritePath()).count(), 3); //. .. and the potato person
-        QVERIFY(m_backend->contacts().contains(uri));
+
+        //READ
+        {
+            QCOMPARE(ptr->customProperty(KPeople::AbstractContact::NameProperty), addr.name());
+        }
+
+        //UPDATE
+        {
+            KPeople::AbstractEditableContact* editable = dynamic_cast<KPeople::AbstractEditableContact*>(ptr.data());
+            QVERIFY(editable);
+            QCOMPARE(QDir(KPeopleVCard::contactsVCardWritePath()).count(), 3); //. .. and the potato person
+            QVERIFY(m_backend->contacts().contains(uri));
+
+            addr.setName("Tomato Person");
+            QSignalSpy spy(m_backend, &KPeople::AllContactsMonitor::contactChanged);
+            QVERIFY(editable->setCustomProperty("vcard", createContact(addr)));
+            QVERIFY(spy.wait());
+            QCOMPARE(spy.constFirst().constFirst(), uri);
+        }
 
         {
             QSignalSpy spy(m_backend, &KPeople::AllContactsMonitor::contactRemoved);
             QVERIFY(m_source->deleteContact(uri));
             QVERIFY(spy.wait());
 
-            uri = spy.constFirst().constFirst().toString();
+            QCOMPARE(spy.constFirst().constFirst().toString(), uri);
         }
         QCOMPARE(QDir(KPeopleVCard::contactsVCardWritePath()).count(), 2); //. .. and the potato person
         QVERIFY(!m_backend->contacts().contains(uri));
