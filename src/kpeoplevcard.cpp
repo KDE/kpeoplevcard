@@ -153,6 +153,8 @@ KPeopleVCard::KPeopleVCard()
 
     processDirectory(QFileInfo(*vcardsLocation));
 
+    emitInitialFetchComplete(true);
+
     connect(m_fs, &KDirWatch::dirty, this, [this](const QString& path) {
         const QFileInfo fi(path);
         if (fi.isFile())
