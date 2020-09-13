@@ -81,8 +81,8 @@ private Q_SLOTS:
         const QString name = QStringLiteral("aaa"), name2 = QStringLiteral("bbb");
         KContacts::Addressee addr;
         addr.setName(name);
-        const QString path = m_vcardsDir.absoluteFilePath("X");
-        const QString pathInSubdir = m_vcardsDir.absoluteFilePath("subdir/a");
+        const QString path = m_vcardsDir.absoluteFilePath("X.vcf");
+        const QString pathInSubdir = m_vcardsDir.absoluteFilePath("subdir/a.vcf");
         // CREATE
         {
             QSignalSpy spy(m_backend, &KPeople::AllContactsMonitor::contactAdded);
