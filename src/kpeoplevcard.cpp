@@ -27,7 +27,6 @@
 #include <KLocalizedString>
 
 #include <KPluginFactory>
-#include <KPluginLoader>
 #include <KFileUtils>
 
 using namespace KPeople;
