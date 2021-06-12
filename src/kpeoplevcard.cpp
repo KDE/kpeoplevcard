@@ -271,6 +271,6 @@ AllContactsMonitor *VCardDataSource::createAllContactsMonitor()
     return new KPeopleVCard();
 }
 
-K_PLUGIN_FACTORY_WITH_JSON(VCardDataSourceFactory, "kpeoplevcard.json", registerPlugin<VCardDataSource>();)
+K_PLUGIN_CLASS_WITH_JSON(VCardDataSource, "kpeoplevcard.json")
 
 #include "kpeoplevcard.moc"
