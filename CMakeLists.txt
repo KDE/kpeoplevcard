@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2015 Aleix Pol Gonzalez <aleixpol@kde.org>
+# SPDX-FileCopyrightText: 2021 Nicolas Fella <nicolas.fella@gmx.de>
+# SPDX-License-Identifier: BSD-3-Clause
+
 cmake_minimum_required(VERSION 3.16)
 project(KPeopleVCard VERSION 0.2)
 
