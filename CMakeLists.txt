@@ -1,10 +1,14 @@
-cmake_minimum_required(VERSION 3.0)
-project(KPeopleVCard)
+cmake_minimum_required(VERSION 3.16)
+project(KPeopleVCard VERSION 0.2)
 
-find_package(ECM 1.0 REQUIRED NO_MODULE)
+set(QT_MIN_VERSION 5.15)
+set(KF_MIN_VERSION 5.83)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+find_package(ECM ${KF_MIN_VERSION} REQUIRED NO_MODULE)
 set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
-
-include(ECMSetupVersion)
 
 include(CMakePackageConfigHelpers)
 include(FeatureSummary)
@@ -17,11 +21,8 @@ include(KDECompilerSettings NO_POLICY_SCOPE)
 
 include(ECMAddTests)
 
-find_package(Qt5  "5.2" REQUIRED COMPONENTS Widgets)
-find_package(KF5  "5.8" REQUIRED COMPONENTS CoreAddons I18n)
-find_package(KF5 "5.62" REQUIRED COMPONENTS People)
-
-find_package(KF5Contacts REQUIRED)
+find_package(Qt5 ${QT_MIN_VERSION} REQUIRED COMPONENTS Widgets)
+find_package(KF5 ${KF_MIN_VERSION} REQUIRED COMPONENTS CoreAddons I18n People Contacts)
 
 add_subdirectory(src)
 add_subdirectory(autotests)
