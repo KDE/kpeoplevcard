@@ -6,16 +6,16 @@
 */
 
 #include "kpeoplevcard.h"
-#include <QDebug>
-#include <QImage>
-#include <QDir>
-#include <QStandardPaths>
-#include <KContacts/VCardConverter>
 #include <KContacts/Picture>
+#include <KContacts/VCardConverter>
 #include <KLocalizedString>
+#include <QDebug>
+#include <QDir>
+#include <QImage>
+#include <QStandardPaths>
 
-#include <KPluginFactory>
 #include <KFileUtils>
+#include <KPluginFactory>
 
 using namespace KPeople;
 
@@ -25,12 +25,24 @@ Q_GLOBAL_STATIC_WITH_ARGS(QString, vcardsWriteLocation, (QStandardPaths::writabl
 class VCardContact : public AbstractEditableContact
 {
 public:
-    VCardContact() {}
-    VCardContact(const KContacts::Addressee& addr, const QUrl &location) : m_addressee(addr), m_location(location) {}
-    void setAddressee(const KContacts::Addressee& addr) { m_addressee = addr; }
-    void setUrl(const QUrl &url) { m_location = url; }
+    VCardContact()
+    {
+    }
+    VCardContact(const KContacts::Addressee &addr, const QUrl &location)
+        : m_addressee(addr)
+        , m_location(location)
+    {
+    }
+    void setAddressee(const KContacts::Addressee &addr)
+    {
+        m_addressee = addr;
+    }
+    void setUrl(const QUrl &url)
+    {
+        m_location = url;
+    }
 
-    QVariant customProperty(const QString & key) const override
+    QVariant customProperty(const QString &key) const override
     {
         QVariant ret;
         if (key == NameProperty) {
@@ -81,7 +93,8 @@ public:
         return ret;
     }
 
-    bool setCustomProperty(const QString & key, const QVariant & value) override {
+    bool setCustomProperty(const QString &key, const QVariant &value) override
+    {
         if (key == VCardProperty) {
             QFile f(m_location.toLocalFile());
             if (!f.open(QIODevice::WriteOnly))
@@ -92,15 +105,17 @@ public:
         return false;
     }
 
-    static QString createUri(const QString& path) {
+    static QString createUri(const QString &path)
+    {
         return QStringLiteral("vcard:/") + path;
     }
+
 private:
     KContacts::Addressee m_addressee;
     QUrl m_location;
 };
 
-bool VCardDataSource::addContact(const QVariantMap & properties)
+bool VCardDataSource::addContact(const QVariantMap &properties)
 {
     if (!properties.contains("vcard"))
         return false;
@@ -142,14 +157,14 @@ KPeopleVCard::KPeopleVCard()
 
     emitInitialFetchComplete(true);
 
-    connect(m_fs, &KDirWatch::dirty, this, [this](const QString& path) {
+    connect(m_fs, &KDirWatch::dirty, this, [this](const QString &path) {
         const QFileInfo fi(path);
         if (fi.isFile())
             processVCard(path);
         else
             processDirectory(fi);
     });
-    connect(m_fs, &KDirWatch::created, this, [this] (const QString &path) {
+    connect(m_fs, &KDirWatch::created, this, [this](const QString &path) {
         const QFileInfo fi(path);
         if (fi.isFile())
             processVCard(path);
@@ -160,14 +175,15 @@ KPeopleVCard::KPeopleVCard()
 }
 
 KPeopleVCard::~KPeopleVCard()
-{}
+{
+}
 
 QMap<QString, AbstractContact::Ptr> KPeopleVCard::contacts()
 {
     return m_contactForUri;
 }
 
-void KPeopleVCard::processDirectory(const QFileInfo& fi)
+void KPeopleVCard::processDirectory(const QFileInfo &fi)
 {
     const QDir dir(fi.absoluteFilePath());
     {
@@ -204,8 +220,8 @@ void KPeopleVCard::processVCard(const QString &path)
     QString uri = VCardContact::createUri(path);
     auto it = m_contactForUri.find(uri);
     if (it != m_contactForUri.end()) {
-        static_cast<VCardContact*>(it->data())->setAddressee(addressee);
-        static_cast<VCardContact*>(it->data())->setUrl(QUrl::fromLocalFile(path));
+        static_cast<VCardContact *>(it->data())->setAddressee(addressee);
+        static_cast<VCardContact *>(it->data())->setUrl(QUrl::fromLocalFile(path));
         Q_EMIT contactChanged(uri, *it);
     } else {
         KPeople::AbstractContact::Ptr contact(new VCardContact(addressee, QUrl::fromLocalFile(path)));
@@ -250,12 +266,12 @@ QString VCardDataSource::sourcePluginId() const
     return QStringLiteral("vcard");
 }
 
-AllContactsMonitor* VCardDataSource::createAllContactsMonitor()
+AllContactsMonitor *VCardDataSource::createAllContactsMonitor()
 {
     return new KPeopleVCard();
 }
 
-K_PLUGIN_FACTORY_WITH_JSON( VCardDataSourceFactory, "kpeoplevcard.json", registerPlugin<VCardDataSource>(); )
-K_EXPORT_PLUGIN( VCardDataSourceFactory("kpeoplevcard") )
+K_PLUGIN_FACTORY_WITH_JSON(VCardDataSourceFactory, "kpeoplevcard.json", registerPlugin<VCardDataSource>();)
+K_EXPORT_PLUGIN(VCardDataSourceFactory("kpeoplevcard"))
 
 #include "kpeoplevcard.moc"

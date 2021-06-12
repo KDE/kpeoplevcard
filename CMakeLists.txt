@@ -18,6 +18,8 @@ include(CheckFunctionExists)
 include(KDEInstallDirs)
 include(KDECMakeSettings)
 include(KDECompilerSettings NO_POLICY_SCOPE)
+include(KDEClangFormat)
+include(KDEGitCommitHooks)
 
 include(ECMAddTests)
 
@@ -37,3 +39,8 @@ configure_package_config_file(
 install(FILES  "${CMAKE_CURRENT_BINARY_DIR}/KF5PeopleVCardConfig.cmake"
         DESTINATION "${CMAKECONFIG_INSTALL_DIR}"
         COMPONENT Devel )
+
+file(GLOB_RECURSE SOURCE_FILES *.cpp *.h)
+kde_clang_format(${SOURCE_FILES})
+
+kde_configure_git_pre_commit_hook(CHECKS CLANG_FORMAT)

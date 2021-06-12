@@ -9,10 +9,10 @@
 #define KPEOPLEVCARD_H
 
 #include <KDirWatch>
-#include <KPeopleBackend/AllContactsMonitor>
 #include <KPeopleBackend/AbstractContact>
-#include <KPeopleBackend/BasePersonsDataSource>
 #include <KPeopleBackend/AbstractEditableContact>
+#include <KPeopleBackend/AllContactsMonitor>
+#include <KPeopleBackend/BasePersonsDataSource>
 
 class QFileInfo;
 
@@ -34,9 +34,8 @@ private:
     void processDirectory(const QFileInfo &fi);
 
     QMap<QString, KPeople::AbstractContact::Ptr> m_contactForUri;
-    KDirWatch* m_fs;
+    KDirWatch *m_fs;
 };
-
 
 class VCardDataSource : public KPeople::BasePersonsDataSourceV2
 {
@@ -45,8 +44,8 @@ public:
     ~VCardDataSource() override;
     QString sourcePluginId() const override;
 
-    KPeople::AllContactsMonitor* createAllContactsMonitor() override;
-    bool addContact(const QVariantMap & properties) override;
+    KPeople::AllContactsMonitor *createAllContactsMonitor() override;
+    bool addContact(const QVariantMap &properties) override;
     bool deleteContact(const QString &uri) override;
 };
 
