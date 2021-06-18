@@ -19,8 +19,21 @@
 
 using namespace KPeople;
 
-Q_GLOBAL_STATIC_WITH_ARGS(QString, vcardsLocation, (QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + ("/kpeoplevcard")))
-Q_GLOBAL_STATIC_WITH_ARGS(QString, vcardsWriteLocation, (QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + ("/kpeoplevcard/own/")))
+#ifdef Q_OS_WIN
+Q_GLOBAL_STATIC_WITH_ARGS(QString, vcardsLocation,
+            (QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + QString::fromLatin1("/Contacts")))
+#else
+Q_GLOBAL_STATIC_WITH_ARGS(QString, vcardsLocation,
+            (QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + QString::fromLatin1("/kpeoplevcard")))
+#endif
+
+#ifdef Q_OS_WIN
+Q_GLOBAL_STATIC_WITH_ARGS(QString, vcardsWriteLocation,
+            (QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + QString::fromLatin1("/Contacts/own")))
+#else
+Q_GLOBAL_STATIC_WITH_ARGS(QString, vcardsWriteLocation,
+            (QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + QString::fromLatin1("/kpeoplevcard/own/")))
+#endif
 
 class VCardContact : public AbstractEditableContact
 {
