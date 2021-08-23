@@ -66,7 +66,7 @@ public:
 
             // If both first and last name are set combine them to a full name
             if (!m_addressee.givenName().isEmpty() && !m_addressee.familyName().isEmpty())
-                return i18nc("given-name family-name", "%1 %2", m_addressee.givenName(), m_addressee.familyName());
+                return i18ndc("kpeoplevcard", "given-name family-name", "%1 %2", m_addressee.givenName(), m_addressee.familyName());
 
             // If only one of them is set just return what we know
             if (!m_addressee.givenName().isEmpty())
