@@ -27,7 +27,7 @@ include(KDEGitCommitHooks)
 
 include(ECMAddTests)
 
-find_package(Qt5 ${QT_MIN_VERSION} REQUIRED COMPONENTS Widgets)
+find_package(Qt${QT_MAJOR_VERSION} ${QT_MIN_VERSION} REQUIRED COMPONENTS Widgets)
 find_package(KF5 ${KF_MIN_VERSION} REQUIRED COMPONENTS CoreAddons I18n People Contacts)
 
 add_subdirectory(src)
