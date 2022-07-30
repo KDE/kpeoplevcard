@@ -3,10 +3,7 @@
     "KPlugin": {
         "EnabledByDefault": true, 
         "Id": "VCardProvider", 
-        "License": "LGPL", 
-        "ServiceTypes": [
-            "KPeople/DataSource"
-        ], 
+        "License": "LGPL",
         "Version": "0.1"
     }
 }
