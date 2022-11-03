@@ -16,7 +16,7 @@
 
 class QFileInfo;
 
-class Q_DECL_EXPORT KPeopleVCard : public KPeople::AllContactsMonitor
+class KPeopleVCard : public KPeople::AllContactsMonitor
 {
     Q_OBJECT
 
