@@ -33,6 +33,8 @@ find_package(KF5 ${KF_MIN_VERSION} REQUIRED COMPONENTS CoreAddons I18n People Co
 add_subdirectory(src)
 add_subdirectory(autotests)
 
+ki18n_install(po)
+
 set(CMAKECONFIG_INSTALL_DIR "${KDE_INSTALL_CMAKEPACKAGEDIR}/KF5PeopleVCard")
 configure_package_config_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/KF5PeopleVCardConfig.cmake.in"
