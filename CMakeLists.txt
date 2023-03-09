@@ -28,21 +28,21 @@ include(KDEGitCommitHooks)
 include(ECMAddTests)
 
 find_package(Qt${QT_MAJOR_VERSION} ${QT_MIN_VERSION} REQUIRED COMPONENTS Widgets)
-find_package(KF5 ${KF_MIN_VERSION} REQUIRED COMPONENTS CoreAddons I18n People Contacts)
+find_package(KF${QT_MAJOR_VERSION} ${KF_MIN_VERSION} REQUIRED COMPONENTS CoreAddons I18n People Contacts)
 
 add_subdirectory(src)
 add_subdirectory(autotests)
 
 ki18n_install(po)
 
-set(CMAKECONFIG_INSTALL_DIR "${KDE_INSTALL_CMAKEPACKAGEDIR}/KF5PeopleVCard")
+set(CMAKECONFIG_INSTALL_DIR "${KDE_INSTALL_CMAKEPACKAGEDIR}/KF${QT_MAJOR_VERSION}PeopleVCard")
 configure_package_config_file(
-  "${CMAKE_CURRENT_SOURCE_DIR}/KF5PeopleVCardConfig.cmake.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/KF5PeopleVCardConfig.cmake"
+  "${CMAKE_CURRENT_SOURCE_DIR}/KFPeopleVCardConfig.cmake.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/KF${QT_MAJOR_VERSION}PeopleVCardConfig.cmake"
   INSTALL_DESTINATION ${CMAKECONFIG_INSTALL_DIR}
 )
 
-install(FILES  "${CMAKE_CURRENT_BINARY_DIR}/KF5PeopleVCardConfig.cmake"
+install(FILES  "${CMAKE_CURRENT_BINARY_DIR}/KF${QT_MAJOR_VERSION}PeopleVCardConfig.cmake"
         DESTINATION "${CMAKECONFIG_INSTALL_DIR}"
         COMPONENT Devel )
 

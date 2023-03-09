@@ -3,4 +3,4 @@
 
 find_package(Qt${QT_MAJOR_VERSION}Test)
 
-ecm_add_test(kpeoplevcardtest.cpp ../src/kpeoplevcard.cpp TEST_NAME kpeoplevcardtest LINK_LIBRARIES KF5::PeopleBackend KF5::CoreAddons Qt::Test KF5::Contacts KF5::I18n)
+ecm_add_test(kpeoplevcardtest.cpp ../src/kpeoplevcard.cpp TEST_NAME kpeoplevcardtest LINK_LIBRARIES KF${QT_MAJOR_VERSION}::PeopleBackend KF${QT_MAJOR_VERSION}::CoreAddons Qt::Test KF${QT_MAJOR_VERSION}::Contacts KF${QT_MAJOR_VERSION}::I18n)
