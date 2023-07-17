@@ -287,3 +287,5 @@ AllContactsMonitor *VCardDataSource::createAllContactsMonitor()
 K_PLUGIN_CLASS_WITH_JSON(VCardDataSource, "kpeoplevcard.json")
 
 #include "kpeoplevcard.moc"
+
+#include "moc_kpeoplevcard.cpp"
